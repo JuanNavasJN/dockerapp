@@ -37,4 +37,4 @@ workflows:
             - build:
                   filters:
                       branches:
-                          only: circle-ci-publish
+                          only: master
