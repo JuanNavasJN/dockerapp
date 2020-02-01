@@ -9,19 +9,22 @@ jobs:
         steps:
             - checkout
             - setup_remote_docker
-            - run:
-                  name: Install dependencies
-                  command: |
-                      apk add --no-cache py-pip=9.0.0-r1
-                      pip install docker-compose==1.15.0
+            # - run:
+            #       name: Install dependencies
+            #       command: |
+            #           apk add --no-cache py-pip=9.0.0-r1
+            #           pip install docker-compose==1.15.0
             - run:
                   name: Build Docker image
-                  command: docker build -t $IMAGE_NAME:latest .
-            - run:
-                  name: Run tests
                   command: |
-                      docker-compose up -d
-                      docker-compose run dockerapp python test.py
+                      docker build -t $IMAGE_NAME:latest .
+                      echo "$DOCKER_HUB_PWD" | docker login -u "$DOCKER_HUB_USER_ID" --password-stdin
+                      docker push $IMAGE_NAME:latest
+            # - run:
+            #       name: Run tests
+            #       command: |
+            #           docker-compose up -d
+            #           docker-compose run dockerapp python test.py
     publish-latest:
         environment:
             IMAGE_NAME: dockerapp
@@ -42,9 +45,9 @@ workflows:
                   filters:
                       branches:
                           only: circle-ci-publish
-            - publish-latest:
-                  requires:
-                      - build
-                  filters:
-                      branches:
-                          only: circle-ci-publish
+            # - publish-latest:
+            #       requires:
+            #           - build
+            #       filters:
+            #           branches:
+            #               only: circle-ci-publish
