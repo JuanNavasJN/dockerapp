@@ -24,15 +24,15 @@ jobs:
                   command: |
                       docker tag dockerapp_dockerapp $IMAGE_NAME:$CIRCLE_SHA1
                       docker tag dockerapp_dockerapp $IMAGE_NAME:latest
-            - run:
-                  name: Publish Image
-                  command: |
-                      docker login -u "$DOCKER_HUB_USER_ID" -p "$DOCKER_HUB_PWD"
-                      docker push $IMAGE_NAME:$CIRCLE_SHA1
-                      docker push $IMAGE_NAME:latest
+            # - run:
+            #       name: Publish Image
+            #       command: |
+            #           docker login -u "$DOCKER_HUB_USER_ID" -p "$DOCKER_HUB_PWD"
+            #           docker push $IMAGE_NAME:$CIRCLE_SHA1
+            #           docker push $IMAGE_NAME:latest
     publish-latest:
         environment:
-            IMAGE_NAME: dockerapp
+            IMAGE_NAME: juannavasjn/dockerapp
         docker:
             - image: circleci/buildpack-deps:stretch
         steps:
@@ -40,7 +40,8 @@ jobs:
             - run:
                   name: Publish Docker Image to Docker Hub
                   command: |
-                      echo "$DOCKER_HUB_PWD" | docker login -u "$DOCKER_HUB_USER_ID" --password-stdin
+                      docker login -u "$DOCKER_HUB_USER_ID" -p "$DOCKER_HUB_PWD"
+                      docker push $IMAGE_NAME:$CIRCLE_SHA1
                       docker push $IMAGE_NAME:latest
 workflows:
     version: 2
@@ -50,9 +51,9 @@ workflows:
                   filters:
                       branches:
                           only: circle-ci-publish
-            # - publish-latest:
-            #       requires:
-            #           - build
-            #       filters:
-            #           branches:
-            #               only: circle-ci-publish
+            - publish-latest:
+                  requires:
+                      - build
+                  filters:
+                      branches:
+                          only: circle-ci-publish
