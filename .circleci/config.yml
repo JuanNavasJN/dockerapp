@@ -1,6 +1,8 @@
 version: 2
 jobs:
     build:
+        environment:
+            IMAGE_NAME: juannavasjn/dockerapp
         working_directory: /dockerapp
         docker:
             - image: docker:17.05.0-ce-git
@@ -13,13 +15,16 @@ jobs:
                       apk add --no-cache py-pip=9.0.0-r1
                       pip install docker-compose==1.15.0
             - run:
+                  name: Build Docker image
+                  command: docker build -t $IMAGE_NAME:latest .
+            - run:
                   name: Run tests
                   command: |
                       docker-compose up -d
                       docker-compose run dockerapp python test.py
     publish-latest:
         environment:
-            IMAGE_NAME: dockerapp
+            IMAGE_NAME: juannavasjn/dockerapp
         docker:
             - image: circleci/buildpack-deps:stretch
         steps:
@@ -28,9 +33,6 @@ jobs:
                   name: Publish Docker Image to Docker Hub
                   command: |
                       echo "$DOCKER_HUB_PWD" | docker login -u "$DOCKER_HUB_USER_ID" --password-stdin
-                      docker tag dockerapp_dockerapp $DOCKER_HUB_USER_ID/dockerapp:$CIRCLE_SHA1
-                      docker tag dockerapp_dockerapp $DOCKER_HUB_USER_ID/dockerapp:latest
-                      docker push $DOCKER_HUB_USER_ID/dockerapp:$CIRCLE_SHA1
                       docker push $DOCKER_HUB_USER_ID/dockerapp:latest
 workflows:
     version: 2
