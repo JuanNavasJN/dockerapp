@@ -15,19 +15,21 @@ jobs:
             #           apk add --no-cache py-pip=9.0.0-r1
             #           pip install docker-compose==1.15.0
             - run:
-                  name: Build Docker image
+                  name: Run tests
                   command: |
-                      docker build -t $IMAGE_NAME:latest .
+                      docker-compose up -d
+                      docker-compose run dockerapp python test.py
+            - run:
+                  name: Docker Tags
+                  command: |
+                      docker tag dockerapp_dockerapp $IMAGE_NAME:$CIRCLE_SHA1
+                      docker tag dockerapp_dockerapp $IMAGE_NAME:latest
             - run:
                   name: Publish Image
                   command: |
                       docker login -u "$DOCKER_HUB_USER_ID" -p "$DOCKER_HUB_PWD"
+                      docker push $IMAGE_NAME:$CIRCLE_SHA1
                       docker push $IMAGE_NAME:latest
-            # - run:
-            #       name: Run tests
-            #       command: |
-            #           docker-compose up -d
-            #           docker-compose run dockerapp python test.py
     publish-latest:
         environment:
             IMAGE_NAME: dockerapp
