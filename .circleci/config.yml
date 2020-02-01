@@ -21,7 +21,7 @@ jobs:
             - run:
                   name: Publish Image
                   command: |
-                      echo "$DOCKER_HUB_PWD" | docker login -u "$DOCKER_HUB_USER_ID" --password-stdin
+                      docker login -u "$DOCKER_HUB_USER_ID" -p "$DOCKER_HUB_PWD"
                       docker push $IMAGE_NAME:latest
             # - run:
             #       name: Run tests
