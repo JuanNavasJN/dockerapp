@@ -18,6 +18,9 @@ jobs:
                   name: Build Docker image
                   command: |
                       docker build -t $IMAGE_NAME:latest .
+            - run:
+                  name: Publish Image
+                  command: |
                       echo "$DOCKER_HUB_PWD" | docker login -u "$DOCKER_HUB_USER_ID" --password-stdin
                       docker push $IMAGE_NAME:latest
             # - run:
